@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FairyTaleBook 등록</title>
+    <style>
+        :root { --bg:#0b0b0d; --bg2:#111114; --card:#17181c; --muted:#9aa0aa; --fg:#e9edf1; --line:#26272c; --pri:#06b6d4; --pri-2:#0891b2; --warn:#f59e0b; --err:#ef4444; --radius:16px;}
+        *{box-sizing:border-box} html,body{height:100%}
+        body{margin:0;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Noto Sans KR,Helvetica,Arial,sans-serif}
+        .wrap{max-width:960px;margin:0 auto;padding:28px}
+        h1{font-size:24px;margin:0 0 8px} p.desc{margin:0 0 18px;color:var(--muted);font-size:14px}
+        .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+        .grid{display:grid;gap:12px} @media(min-width:760px){.grid.two{grid-template-columns:1fr 1fr}}
+        label{display:block;font-size:13px;color:#d5dae1;margin:0 0 6px}
+        .req::after{content:"*";color:#fb7185;margin-left:4px}
+        input[type="text"],input[type="file"]{width:100%;border:1px solid var(--line);background:#101115;border-radius:12px;color:var(--fg);padding:10px 12px;outline:none}
+        input[type="text"]:focus,input[type="file"]:focus{border-color:var(--pri)}
+        .row{display:flex;gap:8px;align-items:center}
+        .btn{appearance:none;border:1px solid var(--line);background:#101115;color:var(--fg);padding:10px 14px;border-radius:12px;cursor:pointer}
+        .btn:hover{border-color:#2f3137} .btn[disabled]{opacity:.5;cursor:not-allowed}
+        .btn.pri{background:var(--pri);border-color:var(--pri);color:#001018}
+        .btn.pri:hover{background:var(--pri-2);border-color:var(--pri-2)}
+        .btn.ghost{background:transparent} .btn.err{background:var(--err);border-color:var(--err)}
+        .muted{color:var(--muted);font-size:12px}
+        .toolbar{display:flex;gap:8px;justify-content:flex-end}
+        .list{display:flex;flex-direction:column;gap:8px}
+        .preview{white-space:pre-wrap;background:#0d0e12;border:1px dashed var(--line);padding:14px;border-radius:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;max-height:260px;overflow:auto}
+        .hr{height:1px;background:var(--line);margin:16px 0}
+        .note{font-size:12px;color:var(--muted)}
+        .thumb-preview{margin-top:8px;display:flex;gap:12px;align-items:center}
+        .thumb-preview img{max-height:72px;border-radius:10px;border:1px solid var(--line)}
+        .chip{border:1px solid var(--line);background:#0f1014;padding:6px 10px;border-radius:999px;font-size:12px;display:inline-flex;align-items:center;gap:6px}
+        .banner{position:sticky;top:-28px;margin:-28px -28px 16px;padding:10px 16px;background:#0f1014;border-bottom:1px solid var(--line);color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+        .countdown{font-variant-numeric:tabular-nums}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <h1>FairyTaleBook 등록</h1>
+        <p class="desc">영문 제목(폴더명)을 기준으로 이미지 업로드 후, 생성된 URL로 도서를 등록합니다.</p>
+    </header>
+
+    <div id="tokenBanner" class="banner" style="display:none">
+        <span>관리자 인증 유지시간 <span id="leftSec" class="countdown">--:--</span></span>
+        <button id="logoutBtn" class="btn ghost">나가기</button>
+    </div>
+
+    <form id="bookForm" class="grid" autocomplete="off">
+
+        <section class="card">
+            <h2 style="margin:0 0 12px;font-size:18px">기본 정보</h2>
+            <div class="grid two">
+                <div>
+                    <label class="req" for="name">책 제목</label>
+                    <input id="name" name="name" type="text" placeholder="예: 토끼와 거북이" required />
+                </div>
+                <div>
+                    <label class="req" for="englishName">영문 제목(폴더명)</label>
+                    <input id="englishName" name="englishName" type="text" placeholder="예: rabbit-and-turtle" required />
+                    <div class="muted">이미지 업로드 전에 반드시 입력</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 style="margin:0 0 12px;font-size:18px">썸네일 업로드</h2>
+            <div class="grid two">
+                <div>
+                    <label class="req" for="thumbFile">이미지 파일</label>
+                    <input id="thumbFile" type="file" accept="image/*" />
+                    <div class="row" style="margin-top:8px">
+                        <button type="button" class="btn pri" id="uploadThumbBtn" disabled>썸네일 업로드</button>
+                        <span class="muted">영문 제목이 비어 있으면 업로드할 수 없습니다.</span>
+                    </div>
+                    <div class="thumb-preview" id="thumbPreview"></div>
+                </div>
+                <div>
+                    <label>결과 URL</label>
+                    <input id="thumbnailUrl" type="text" placeholder="업로드 후 채워집니다" readonly />
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 style="margin:0 0 12px;font-size:18px">스틸컷 업로드</h2>
+            <div class="grid two">
+                <div>
+                    <label class="req" for="stillFiles">이미지 파일들 (복수 선택 가능)</label>
+                    <input id="stillFiles" type="file" accept="image/*" multiple />
+                    <div class="row" style="margin-top:8px">
+                        <button type="button" class="btn pri" id="uploadStillsBtn" disabled>스틸컷 업로드</button>
+                        <span class="muted">영문 제목이 비어 있으면 업로드할 수 없습니다.</span>
+                    </div>
+                </div>
+                <div>
+                    <label>업로드된 스틸컷</label>
+                    <div id="stillChips" class="list"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 style="margin:0 0 12px;font-size:18px">태그</h2>
+            <div id="tagList" class="list"></div>
+            <div class="row" style="margin-top:8px">
+                <button type="button" class="btn pri" id="addTag">+ 태그 추가</button>
+                <span class="muted">빈 칸은 자동으로 무시됩니다.</span>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 style="margin:0 0 12px;font-size:18px">전송 미리보기(JSON)</h2>
+            <div id="preview" class="preview">{ }</div>
+            <div class="toolbar" style="margin-top:10px">
+                <button type="button" class="btn ghost" id="resetBtn">초기화</button>
+                <button type="submit" class="btn pri" id="submitBtn">등록하기</button>
+            </div>
+            <div class="hr"></div>
+            <div class="note">* 업로드는 <code>multipart/form-data</code>로 <code>file</code>과 <code>folder</code>(=영문 제목)를 함께 전송합니다. 서버는 저장 후 공개 URL을 응답합니다. 최종 등록은 JSON POST입니다.</div>
+        </section>
+
+    </form>
+</div>
+
+<template id="tpl-row">
+    <div class="row">
+        <input class="flex1" type="text" placeholder="예: 우정" style="flex:1" />
+        <button type="button" class="btn err">삭제</button>
+    </div>
+</template>
+
+<script>
+    // ====== 엔드포인트 ======
+    const API_BOOKS = "/book/add";
+    const API_UPLOAD_THUMB = "/book/add/thumbnail";
+    const API_UPLOAD_STILL = "/book/add/still";
+    const ADMIN_LOGIN_PAGE = "/admin/login";
+
+    // ====== 토큰 유틸 ======
+    function getAdminToken() {
+        return sessionStorage.getItem("talet_admin_jwt") || "";
+    }
+    function decodeJwtPayload(token) {                         // ★ 디버깅/검증용
+        try {
+            const [, base64Url] = token.split(".");
+            if (!base64Url) return null;
+            const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+            return JSON.parse(atob(base64));
+        } catch {
+            return null;
+        }
+    }
+    function decodeJwtExp(token) {
+        const p = decodeJwtPayload(token);
+        return p?.exp ? p.exp * 1000 : 0;
+    }
+    function isTokenValid() {
+        const t = getAdminToken();
+        if (!t) return false;
+        const expMs = decodeJwtExp(t);
+        if (!expMs) return false;
+        return Date.now() < expMs;
+    }
+    function enforceTokenOrLeave() {
+        if (!isTokenValid()) {
+            sessionStorage.removeItem("talet_admin_jwt");
+            window.location.replace(ADMIN_LOGIN_PAGE);
+            return false;
+        }
+        return true;
+    }
+
+    // 만료 카운트다운(UX용)
+    const bannerEl = document.getElementById("tokenBanner");
+    const leftSecEl = document.getElementById("leftSec");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    function startExpiryWatcher() {
+        const token = getAdminToken();
+        if (!token) return;
+        const expMs = decodeJwtExp(token);
+        if (!expMs) return;
+
+        // ★ 권한(roles)과 tokenType을 배너 title로 보여주기(디버깅에 도움)
+        const payload = decodeJwtPayload(token);                 // ★
+        if (bannerEl) {                                          // ★
+            bannerEl.title = `tokenType=${payload?.tokenType}, roles=${payload?.roles}`; // ★
+            bannerEl.style.display = "flex";
+        }
+
+        function renderLeft() {
+            const left = Math.max(0, Math.floor((expMs - Date.now()) / 1000));
+            const mm = String(Math.floor(left / 60)).padStart(2, "0");
+            const ss = String(left % 60).padStart(2, "0");
+            if (leftSecEl) leftSecEl.textContent = `${mm}:${ss}`;
+            if (left <= 0) enforceTokenOrLeave();
+        }
+        renderLeft();
+        const id = setInterval(() => {
+            if (!isTokenValid()) {
+                clearInterval(id);
+                enforceTokenOrLeave();
+                return;
+            }
+            renderLeft();
+        }, 1000);
+    }
+
+    logoutBtn?.addEventListener("click", () => {
+        sessionStorage.removeItem("talet_admin_jwt");
+        window.location.replace(ADMIN_LOGIN_PAGE);
+    });
+
+    // ★ Authorization 헤더 안전 생성기 (Bearer 접두사 보장)
+    function buildAuthHeaders(initHeaders = {}) {
+        const token = getAdminToken();
+        const h = new Headers(initHeaders);
+        if (token) h.set("Authorization", `Bearer ${token}`);
+        return h;
+    }
+
+    // 공통 fetch 래퍼: Authorization 자동 첨부 + 401/403 방어 + 상세 로그
+    async function authFetch(url, options = {}) {
+        if (!enforceTokenOrLeave()) return Promise.reject(new Error("Token invalid"));
+
+        const isFormData = options?.body instanceof FormData;     // ★ FormData일 땐 Content-Type 강제 금지
+        const headers = buildAuthHeaders(options.headers || {});  // ★
+
+        // Content-Type은 JSON 전송시에만 세팅
+        if (!isFormData && options?.body && !(headers.has("Content-Type"))) { // ★
+            // JSON 요청 시 상위에서 이미 넣는다면 그대로 두기
+        }
+
+        const finalOptions = { ...options, headers };
+        const res = await fetch(url, finalOptions);
+
+        // 디버깅 로그(짧은 토큰, 상태)
+        // eslint-disable-next-line no-console
+        console.debug("[authFetch]",
+            url,
+            res.status,
+            headers.get("Authorization")?.slice(0, 20) + "...");   // ★
+
+        if (res.status === 401 || res.status === 403) {
+            sessionStorage.removeItem("talet_admin_jwt");
+            window.location.replace(ADMIN_LOGIN_PAGE);
+            throw new Error("권한이 없습니다(만료 또는 무효).");
+        }
+        return res;
+    }
+
+    // ====== DOM ======
+    const formEl = document.getElementById("bookForm");
+    const previewEl = document.getElementById("preview");
+    const tagList = document.getElementById("tagList");
+    const addTagBtn = document.getElementById("addTag");
+    const resetBtn = document.getElementById("resetBtn");
+    const rowTpl = document.getElementById("tpl-row");
+
+    const englishNameEl = document.getElementById("englishName");
+    const thumbInput = document.getElementById("thumbFile");
+    const uploadThumbBtn = document.getElementById("uploadThumbBtn");
+    const thumbUrlInput = document.getElementById("thumbnailUrl");
+    const thumbPreview = document.getElementById("thumbPreview");
+
+    const stillFilesInput = document.getElementById("stillFiles");
+    const uploadStillsBtn = document.getElementById("uploadStillsBtn");
+    const stillChips = document.getElementById("stillChips");
+
+    // ====== 상태 ======
+    const state = { thumbnail: "", stillImages: [], tags: [""] };
+
+    // ====== 유틸 ======
+    function valuesFrom(listEl) {
+        return Array.from(listEl.querySelectorAll("input"))
+            .map(i => i.value.trim())
+            .filter(v => v !== "");
+    }
+    function getEnglishName() { return (englishNameEl.value || "").trim(); }
+    const EN_RULE = /^[A-Za-z0-9-_]+$/;
+
+    function toggleUploadButtons() {
+        const v = getEnglishName();
+        const enabled = v.length > 0 && EN_RULE.test(v);
+        uploadThumbBtn.disabled = !enabled;
+        uploadStillsBtn.disabled = !enabled;
+    }
+    function updatePreview() {
+        previewEl.textContent = JSON.stringify(collectData(), null, 2);
+    }
+
+    function makeTagRow() {
+        const node = rowTpl.content.firstElementChild.cloneNode(true);
+        const input = node.querySelector("input");
+        const delBtn = node.querySelector("button");
+        input.addEventListener("input", updatePreview);
+        delBtn.addEventListener("click", () => { node.remove(); updatePreview(); });
+        return node;
+    }
+
+    function renderThumb() {
+        thumbPreview.innerHTML = "";
+        if (state.thumbnail) {
+            const img = new Image(); img.src = state.thumbnail; img.alt = "thumbnail";
+            thumbPreview.appendChild(img);
+            const chip = document.createElement("span");
+            chip.className = "chip";
+            chip.innerHTML = `URL 복사 <button type="button" class="btn ghost" style="padding:2px 8px">복사</button>`;
+            chip.querySelector("button").addEventListener("click", () => {
+                navigator.clipboard.writeText(state.thumbnail);
+            });
+            thumbPreview.appendChild(chip);
+        }
+        thumbUrlInput.value = state.thumbnail || "";
+        updatePreview();
+    }
+
+    function renderStillChips() {
+        stillChips.innerHTML = "";
+        state.stillImages.forEach((url, i) => {
+            const row = document.createElement("div"); row.className = "row";
+            const a = document.createElement("a"); a.textContent = url; a.href = url; a.target = "_blank"; a.className = "muted"; a.style.flex = "1";
+            const del = document.createElement("button"); del.className = "btn err"; del.type = "button"; del.textContent = "삭제";
+            del.addEventListener("click", () => { state.stillImages.splice(i, 1); renderStillChips(); });
+            row.appendChild(a); row.appendChild(del);
+            stillChips.appendChild(row);
+        });
+        updatePreview();
+    }
+
+    // 파일 업로드 (Authorization 자동 첨부)
+    async function uploadFile(endpoint, file) {
+        if (!enforceTokenOrLeave()) throw new Error("권한 없음");
+        const folder = getEnglishName();
+        if (!folder) throw new Error("영문 제목(폴더명)을 먼저 입력하세요.");
+        if (!EN_RULE.test(folder)) throw new Error("영문 제목은 영문/숫자/하이픈/언더스코어만 허용됩니다.");
+
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("folder", folder);
+
+        const res = await authFetch(endpoint, { method: "POST", body: fd });
+        if (!res.ok) throw new Error("업로드 실패: " + res.status);
+
+        // 응답은 TaletApiResponse라고 가정
+        const json = await res.json().catch(() => ({}));
+        if (!json?.success) throw new Error(json?.error?.message || "업로드 실패");
+        const url = json?.data?.url || json?.data;
+        if (!url) throw new Error("서버가 URL을 반환하지 않았습니다.");
+        return url;
+    }
+
+    // ====== 수집/검증/전송 ======
+    function collectData() {
+        return {
+            name: document.getElementById("name").value.trim(),
+            englishName: getEnglishName(),
+            thumbnail: state.thumbnail,
+            stillImages: state.stillImages.slice(),
+            tags: valuesFrom(tagList)
+        };
+    }
+    function validate(data) {
+        const errs = [];
+        if (!data.name) errs.push("책 제목은 필수입니다.");
+        if (!data.englishName) errs.push("영문 제목(폴더명)은 필수입니다.");
+        if (!EN_RULE.test(data.englishName)) errs.push("영문 제목은 영문/숫자/하이픈/언더스코어만 허용됩니다.");
+        if (!data.thumbnail) errs.push("썸네일을 업로드해주세요.");
+        return errs;
+    }
+
+    async function submitJson(data) {
+        if (!enforceTokenOrLeave()) throw new Error("권한 없음");
+        const res = await authFetch(API_BOOKS, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },        // ★ JSON 전송 시에만 Content-Type 지정
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error("서버 오류: " + res.status);
+
+        const json = await res.json().catch(() => ({}));
+        if (json && typeof json === "object" && "success" in json) {
+            if (!json.success) throw new Error(json?.error?.message || "등록 실패");
+            return json;
+        }
+        return json;
+    }
+
+    function resetForm() {
+        formEl.reset();
+        state.thumbnail = "";
+        state.stillImages = [];
+        tagList.innerHTML = "";
+        tagList.appendChild(makeTagRow());
+        renderThumb();
+        renderStillChips();
+        toggleUploadButtons();
+        updatePreview();
+    }
+
+    // ====== 이벤트 ======
+    formEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && e.target.tagName !== "TEXTAREA") e.preventDefault();
+    });
+    ["input", "change", "keyup", "blur"].forEach(ev => {
+        englishNameEl.addEventListener(ev, toggleUploadButtons);
+    });
+
+    uploadThumbBtn.addEventListener("click", async () => {
+        const f = thumbInput.files?.[0];
+        if (!f) { alert("썸네일 파일을 선택하세요."); return; }
+        try {
+            const url = await uploadFile(API_UPLOAD_THUMB, f);
+            state.thumbnail = url;
+            renderThumb();
+        } catch (e) { alert(e.message || e); }
+    });
+
+    uploadStillsBtn.addEventListener("click", async () => {
+        const files = Array.from(stillFilesInput.files || []);
+        if (files.length === 0) { alert("스틸컷 파일을 선택하세요."); return; }
+        try {
+            for (const f of files) {
+                const url = await uploadFile(API_UPLOAD_STILL, f);
+                state.stillImages.push(url);
+            }
+            renderStillChips();
+            stillFilesInput.value = "";
+        } catch (e) { alert(e.message || e); }
+    });
+
+    addTagBtn.addEventListener("click", () => { tagList.appendChild(makeTagRow()); updatePreview(); });
+    resetBtn.addEventListener("click", (e) => { e.preventDefault(); resetForm(); });
+    formEl.addEventListener("input", updatePreview);
+
+    formEl.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        if (!enforceTokenOrLeave()) return;
+        const data = collectData();
+        const errs = validate(data);
+        if (errs.length) { alert("입력 오류: " + errs.join("\n")); return; }
+        try {
+            const json = await submitJson(data);
+            alert((json?.message || "등록이 완료되었습니다!"));
+            resetForm();
+        } catch (err) { alert("등록 실패: " + (err?.message || err)); }
+    });
+
+    // ====== 초기 구동 ======
+    if (!enforceTokenOrLeave()) {
+        // redirect됨
+    } else {
+        // ★ 첫 로딩 시 토큰 페이로드를 콘솔로 확인 (권한/토큰타입 즉시 검증)
+        const p = decodeJwtPayload(getAdminToken());             // ★
+        console.debug("[admin token payload]", p);               // ★
+        startExpiryWatcher();
+        tagList.appendChild(makeTagRow());
+        renderThumb();
+        renderStillChips();
+        toggleUploadButtons();
+        updatePreview();
+    }
+</script>
+
+</body>
+</html>

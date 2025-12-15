@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Talet 관리자 인증 (비밀번호)</title>
+    <style>
+        body{font-family:system-ui,Arial; background:#f6f7fb; height:100vh; display:flex; align-items:center; justify-content:center; margin:0;}
+        .card{width:360px; background:#fff; padding:24px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.08);}
+        h1{margin:0 0 8px 0; font-size:18px;}
+        p{margin:0 0 16px 0; color:#6b7280; font-size:13px;}
+        input{width:100%; padding:10px; border:1px solid #e6e9ef; border-radius:8px; font-size:14px; box-sizing:border-box;}
+        button{width:100%; margin-top:12px; padding:10px; border-radius:8px; background:#4334E2; color:#fff; border:none; font-weight:600; cursor:pointer;}
+        .error{color:#b91c1c; margin-top:10px; font-size:13px; display:none;}
+        .small{font-size:12px; color:#6b7280; margin-top:10px;}
+    </style>
+</head>
+<body>
+<div class="card" role="main">
+    <h1>관리자 비밀번호 입력</h1>
+    <p>책 추가 권한을 얻으려면 관리자 비밀번호를 입력하세요.</p>
+
+    <input id="adminPwd" type="password" placeholder="관리자 비밀번호" autocomplete="off" />
+    <button id="submitBtn">인증</button>
+    <div id="error" class="error" role="alert"></div>
+</div>
+
+<script>
+    const ENDPOINT = '/auth/admin/login'; // 백엔드 엔드포인트
+    const REDIRECT = '/admin/book/add'; // 인증 성공 후 이동할 관리자 페이지
+
+    const pwd = document.getElementById('adminPwd');
+    const btn = document.getElementById('submitBtn');
+    const err = document.getElementById('error');
+
+    function showError(text){
+        err.textContent = text;
+        err.style.display = 'block';
+    }
+    function hideError(){
+        err.style.display = 'none';
+        err.textContent = '';
+    }
+
+    async function submit() {
+        hideError();
+        const password = pwd.value.trim();
+        if (!password) {
+            showError('비밀번호를 입력하세요.');
+            return;
+        }
+        btn.disabled = true;
+        btn.textContent = '인증중...';
+
+        try {
+            const resp = await fetch(ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+
+            const text = await resp.text();
+            let json;
+            try { json = JSON.parse(text); } catch { json = null; }
+
+            if (!resp.ok || !json?.success) {
+                const msg = json?.message || json?.error?.message || resp.statusText;
+                showError('인증 실패: ' + msg);
+                btn.disabled = false;
+                btn.textContent = '인증';
+                console.log(json)
+                return;
+            }
+
+            // TaletApiResponse.success(token) 구조 → token은 data 필드에 들어있음
+            const adminToken = json.data;
+            if (!adminToken) {
+                showError('서버 응답 오류: 토큰이 없습니다.');
+                btn.disabled = false;
+                btn.textContent = '인증';
+                return;
+            }
+
+            // 세션 스토리지에 저장
+            sessionStorage.setItem('talet_admin_jwt', adminToken);
+            window.location.href = REDIRECT;
+
+        } catch (e) {
+            console.error(e);
+            showError('네트워크 오류가 발생했습니다.');
+            btn.disabled = false;
+            btn.textContent = '인증';
+        }
+    }
+
+    btn.addEventListener('click', submit);
+    pwd.addEventListener('keyup', (e) => { if (e.key === 'Enter') submit(); });
+</script>
+</body>
+</html>
