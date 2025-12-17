@@ -132,16 +132,14 @@ public class AuthService {
 
     // 회원가입
     public Member signUp(SignUpDTO dto) {
-        List<String> voice = new ArrayList<>();
-        List<BookMark> bookmarks = new ArrayList<>();
         String role = "USER";
         Member member = new Member();
+        member.setIdentifier(dto.getIdentifier());
         member.setName(dto.getName());
         member.setBirthDate(dto.getBirthDate());
         member.setGender(dto.getGender());
         member.setNativeLanguages(dto.getNativeLanguages());
         member.setPlatform(dto.getPlatform());
-        member.setBookmarks(bookmarks);
         member.setRole(role);
         log.info("Identifier={} : 회원가입 성공",  dto.getIdentifier());
         return memberRepository.save(member);

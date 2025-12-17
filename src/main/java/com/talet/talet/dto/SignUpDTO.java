@@ -1,6 +1,7 @@
 package com.talet.talet.dto;
 
 import com.talet.talet.util.LanguageEnum;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,8 +20,8 @@ public class SignUpDTO {
     private String gender;
     @Schema(description = "사용 언어", example = "[\"KOREAN\", \"ENGLISH\"]")
     private List<LanguageEnum> nativeLanguages;
-    @Schema(description = "넣지마세요")
+    @Hidden
     private String platform;
-    @Schema(description = "넣지 마세요 제가 알아서 바꿉니다.")
+    @Hidden
     private String identifier;
 }
