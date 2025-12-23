@@ -34,7 +34,6 @@ public class TTSService {
         String memberId = member.getMemberId();
         FairyTaleBook book = fairyTaleBookService.getBook(bookId);
         String fullText = fairyTaleBookService.getContent(book.getEnglishName());
-        System.out.println(2);
         String language = LanguageEnum.KOREAN.toString();
         if (member.getNativeLanguages().size() > 1) {
             for (LanguageEnum lan: member.getNativeLanguages()) {

@@ -4,6 +4,7 @@ import com.talet.talet.dto.TTSRequestDTO;
 import com.talet.talet.dto.TTSResultRequestDTO;
 import com.talet.talet.service.TTSService;
 import com.talet.talet.util.TaletApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class TTSController {
 
     private static final String TTS_RESULT_KEY_PREFIX = "tts:result:";
 
+    @Operation(summary = "동화책 내용 요청", description = "TTS를 사용한 동화책 내용 요청하기")
     @PostMapping("/book")
     public ResponseEntity<TaletApiResponse<?>> requestTTSForBook(@RequestBody TTSRequestDTO dto, @AuthenticationPrincipal UserDetails userDetails) {
         try {
@@ -33,6 +35,7 @@ public class TTSController {
         }
     }
 
+    @Operation(summary = "동화책 내용 받아오기", description = "polling 으로 동화책 내용 받아오기")
     @GetMapping("/result")
     public ResponseEntity<TaletApiResponse<?>> getTTSResult(@RequestBody TTSResultRequestDTO ttsResultRequestDTO) {
         String baseKey = TTS_RESULT_KEY_PREFIX + ttsResultRequestDTO.getJobId();
