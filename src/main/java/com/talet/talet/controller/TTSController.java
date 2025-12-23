@@ -3,6 +3,7 @@ package com.talet.talet.controller;
 import com.talet.talet.dto.TTSRequestDTO;
 import com.talet.talet.dto.TTSResultRequestDTO;
 import com.talet.talet.service.TTSService;
+import com.talet.talet.util.ErrorEnum;
 import com.talet.talet.util.TaletApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,7 @@ public class TTSController {
             List<String> jobIds = ttsService.requestTTSForBook(dto.getBookId(), userDetails.getUsername(), dto.getVoiceId());
             return ResponseEntity.ok(TaletApiResponse.success(jobIds, "TTS 요청이 정상적으로 접수되었습니다."));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(TaletApiResponse.error("TTS_001", 500, "TTS 요청 처리 중 오류가 발생했습니다."));
+            return ResponseEntity.status(500).body(TaletApiResponse.error(ErrorEnum.COMMON_INTERNAL_ERROR));
         }
     }
 

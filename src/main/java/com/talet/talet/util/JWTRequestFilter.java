@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -139,10 +140,10 @@ public class JWTRequestFilter extends OncePerRequestFilter {
 
     private void setErrorResponse(HttpServletResponse response, ErrorEnum error) throws IOException {
         String code = error.getCode();
-        int status = error.getStatus();
+        HttpStatus status = error.getStatus();
         String message = error.getMessage();
         log.error(message);
-        response.setStatus(status);
+        response.setStatus(status.value());
         response.setContentType("application/json;charset=UTF-8");
         TaletApiResponse<Object> errorResponse = TaletApiResponse.error(code, status, message);
         response.getWriter().write(new ObjectMapper().writeValueAsString(errorResponse));

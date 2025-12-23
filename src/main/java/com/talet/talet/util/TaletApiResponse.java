@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -55,12 +56,19 @@ public class TaletApiResponse<T> {
                 .build();
     }
 
-    public static <T> TaletApiResponse<T> error(String code, int status, String message, List<String> details) {
+    public static <T> TaletApiResponse<T> error(String code, HttpStatus status, String message, List<String> details) {
         return error(ErrorResponse.of(code, status, message, details));
     }
 
-    public static <T> TaletApiResponse<T> error(String code, int status, String message) {
+    public static <T> TaletApiResponse<T> error(String code, HttpStatus status, String message) {
         return error(ErrorResponse.of(code, status, message, null));
+    }
+    public static <T> TaletApiResponse<T> error(ErrorEnum errorEnum, List<String> details) {
+        return error(ErrorResponse.of(errorEnum.getCode(), errorEnum.getStatus(), errorEnum.getMessage(), details));
+    }
+
+    public static <T> TaletApiResponse<T> error(ErrorEnum errorEnum) {
+        return error(ErrorResponse.of(errorEnum.getCode(), errorEnum.getStatus(), errorEnum.getMessage(), null));
     }
 
 
@@ -71,16 +79,16 @@ public class TaletApiResponse<T> {
         @Schema(description = "에러 코드", example = "AUTH_001")
         private String code;
         @Schema(description = "HTTP 상태", example = "401")
-        private int status;
+        private HttpStatus status;
         @Schema(description = "에러 메시지", example = "인증 토큰이 유효하지 않습니다.")
         private String message;
         @Schema(description = "상세 메시지 목록", example = "[\"idToken is invalid\"]")
         private List<String> details;
 
-        public static ErrorResponse of(String code, int status, String message) {
+        public static ErrorResponse of(String code, HttpStatus status, String message) {
             return new ErrorResponse(code, status, message, null);
         }
-        public static ErrorResponse of(String code, int status, String message, List<String> details) {
+        public static ErrorResponse of(String code, HttpStatus status, String message, List<String> details) {
             return new ErrorResponse(code, status, message, details);
         }
     }
