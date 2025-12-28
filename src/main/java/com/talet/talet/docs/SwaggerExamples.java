@@ -45,6 +45,7 @@ public class SwaggerExamples {
         {
             "success": true,
             "message": "로그아웃이 성공적으로 완료되었습니다.",
+            "data": null,
             "error": null
         }
     """;
@@ -53,6 +54,7 @@ public class SwaggerExamples {
         {
             "success": true,
             "message": "성공적으로 탈퇴가 완료되었습니다.",
+            "data": null,
             "error": null
         }
     """;
@@ -147,6 +149,39 @@ public class SwaggerExamples {
                 "birthday": "2019-01",
                 "languages": ["KOREAN", "ENGLISH"]
             },
+            "error": null
+        }
+    """;
+
+    //============================================================
+    public static final String VOICE_UPLOAD_OK = """
+        {
+            "success": true,
+            "message": "음성 파일이 정상적으로 저장되었습니다.",
+            "data": null,
+            "error": null
+        }
+    """;
+    public static final String VOICE_LIST_OK = """
+        {
+            "success": true,
+            "message": "요청이 성공적으로 처리되었습니다.",
+            "data": [
+                {
+                    "id": 1,
+                    "fileName": "아빠 목소리",
+                    "filePath": "https://talet.site/voice/sample1.wav",
+                    "profile": "https://talet.site/images/profile1.jpg",
+                    "language": "JAPANESE"
+                },
+                {
+                    "id": 2,
+                    "fileName": "엄마 목소리",
+                    "filePath": "https://talet.site/voice/sample2.wav",
+                    "profile": "https://talet.site/images/profile2.jpg",
+                    "language": "KOREAN"
+                },
+            ],
             "error": null
         }
     """;

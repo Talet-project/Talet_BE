@@ -1,5 +1,7 @@
 package com.talet.talet.controller;
 
+import com.talet.talet.docs.voice.VoiceList;
+import com.talet.talet.docs.voice.VoiceUpload;
 import com.talet.talet.dto.VoiceRequestDTO;
 import com.talet.talet.dto.VoiceResponseDTO;
 import com.talet.talet.entity.VoiceFile;
@@ -30,6 +32,7 @@ public class VoiceController {
 
     // 음성파일 업로드
     @Operation(summary = "음성파일 업로드", description = "음성파일 업로드 api", security = {@SecurityRequirement(name = "bearerAuth")})
+    @VoiceUpload
     @PostMapping
     public ResponseEntity<?> uploadVoice(@RequestHeader("Authorization") String token, @RequestParam("voice") MultipartFile voice, @RequestParam("profile") MultipartFile profile, @ModelAttribute VoiceRequestDTO dto) {
         boolean isUpload = voiceFileService.uploadVoice(token, voice, profile, dto);
@@ -41,6 +44,7 @@ public class VoiceController {
 
     // 음성파일 리스트 조회
     @Operation(summary = "음성파일 리스트 조회", description = "음성파일 리스트 조회 api", security = {@SecurityRequirement(name = "bearerAuth")})
+    @VoiceList
     @GetMapping
     public ResponseEntity<?> listVoices(@RequestHeader("Authorization") String token, @AuthenticationPrincipal UserDetails userDetails) {
         List<VoiceResponseDTO> voices = voiceFileService.getVoiceFiles(userDetails.getUsername());
