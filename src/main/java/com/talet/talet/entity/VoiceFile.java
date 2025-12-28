@@ -1,5 +1,6 @@
 package com.talet.talet.entity;
 
+import com.talet.talet.util.LanguageEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class VoiceFile {
     private String fileName;      // 원본 파일명
     private String filePath;      // 파일 저장경로/URL
     private String profile;       // 프로필
+    private LanguageEnum language; // 언어
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id") // member 테이블의 PK를 FK로 사용

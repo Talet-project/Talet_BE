@@ -8,6 +8,7 @@ import com.talet.talet.service.VoiceFileService;
 import com.talet.talet.util.TaletApiResponse;
 import com.talet.talet.util.ErrorEnum;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -28,10 +29,10 @@ public class VoiceController {
     private final VoiceFileService voiceFileService;
 
     // 음성파일 업로드
-    @Operation(summary = "음성파일 업로드", description = "음성파일 업로드 api")
+    @Operation(summary = "음성파일 업로드", description = "음성파일 업로드 api", security = {@SecurityRequirement(name = "bearerAuth")})
     @PostMapping
     public ResponseEntity<?> uploadVoice(@RequestHeader("Authorization") String token, @RequestParam("voice") MultipartFile voice, @RequestParam("profile") MultipartFile profile, @ModelAttribute VoiceRequestDTO dto) {
-        boolean isUpload = voiceFileService.uploadVoice(token, voice, profile, dto.getFileName());
+        boolean isUpload = voiceFileService.uploadVoice(token, voice, profile, dto);
         if (!isUpload) {
             throw new CustomException(ErrorEnum.COMMON_INTERNAL_ERROR);
         }
@@ -39,9 +40,9 @@ public class VoiceController {
     }
 
     // 음성파일 리스트 조회
-    @Operation(summary = "음성파일 리스트 조회", description = "음성파일 리스트 조회 api")
+    @Operation(summary = "음성파일 리스트 조회", description = "음성파일 리스트 조회 api", security = {@SecurityRequirement(name = "bearerAuth")})
     @GetMapping
-    public ResponseEntity<?> listVoices(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> listVoices(@RequestHeader("Authorization") String token, @AuthenticationPrincipal UserDetails userDetails) {
         List<VoiceResponseDTO> voices = voiceFileService.getVoiceFiles(userDetails.getUsername());
         return ResponseEntity.ok(TaletApiResponse.success(voices));
     }
@@ -60,7 +61,7 @@ public class VoiceController {
 //    }
 
     // 음성파일 삭제
-    @Operation(summary = "음성파일 삭제", description = "음성파일 삭제 api")
+    @Operation(summary = "음성파일 삭제", description = "음성파일 삭제 api", security = {@SecurityRequirement(name = "bearerAuth")})
     @DeleteMapping("/{voiceFileId}")
     public ResponseEntity<?> deleteVoice(@PathVariable Long voiceFileId) {
         voiceFileService.deleteVoiceFile(voiceFileId);

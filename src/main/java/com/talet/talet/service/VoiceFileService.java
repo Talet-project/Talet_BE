@@ -1,5 +1,6 @@
 package com.talet.talet.service;
 
+import com.talet.talet.dto.VoiceRequestDTO;
 import com.talet.talet.dto.VoiceResponseDTO;
 import com.talet.talet.entity.Member;
 import com.talet.talet.entity.VoiceFile;
@@ -38,7 +39,7 @@ public class VoiceFileService {
     private final VoiceFileRepository voiceFileRepository;
 
     @Transactional
-    public boolean uploadVoice(String token, MultipartFile voice, MultipartFile profile, String fileName) {
+    public boolean uploadVoice(String token, MultipartFile voice, MultipartFile profile, VoiceRequestDTO dto) {
         String identifier = jwtTokenUtil.getIdentifierFromToken(token);
         Member member = memberRepository.findByIdentifier(identifier);
         String folderPath = voiceUploadDir + "/" + identifier;
@@ -55,9 +56,10 @@ public class VoiceFileService {
             return false;
         }
         VoiceFile voiceFile = new VoiceFile();
-        voiceFile.setFileName(fileName);
+        voiceFile.setFileName(dto.getFileName());
         voiceFile.setFilePath(voicePath);
         voiceFile.setProfile(profilePath);
+        voiceFile.setLanguage(dto.getLanguage());
         voiceFile.setMember(member);
         voiceFileRepository.save(voiceFile);
         return true;
@@ -121,6 +123,7 @@ public class VoiceFileService {
             voiceResponseDTO.setFileName(voiceFile.getFileName());
             voiceResponseDTO.setFilePath(publicBaseUrl + voiceFile.getFilePath());
             voiceResponseDTO.setProfile(publicBaseUrl + voiceFile.getProfile());
+            voiceResponseDTO.setLanguage(voiceFile.getLanguage());
             voiceResponseDTOS.add(voiceResponseDTO);
         }
         return voiceResponseDTOS;
