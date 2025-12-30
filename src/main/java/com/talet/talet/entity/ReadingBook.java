@@ -23,8 +23,8 @@ public class ReadingBook {
     private FairyTaleBook book;
 
     @Column(nullable = false)
-    private int status;
+    private int status; // Double로 하고
 
     @Column(nullable = false)
-    private boolean isCompleted;
+    private boolean isCompleted; // 이건 굳이 무쓸모 - iOS 에서 알아서 처리할거임
 }

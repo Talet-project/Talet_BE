@@ -36,6 +36,11 @@ public class TTSController {
         }
     }
 
+    @GetMapping("/default/book")
+    public ResponseEntity<?> requestTTSApi() {
+        return null;
+    }
+
     @Operation(summary = "동화책 내용 받아오기", description = "polling 으로 동화책 내용 받아오기")
     @GetMapping("/result")
     public ResponseEntity<TaletApiResponse<?>> getTTSResult(@RequestBody TTSResultRequestDTO ttsResultRequestDTO) {

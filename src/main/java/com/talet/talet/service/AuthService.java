@@ -160,7 +160,7 @@ public class AuthService {
             member = memberRepository.findByIdentifier(identifier);
         }
         if (member != null) {
-            removeToken(identifier);
+            removeToken(token);
             memberRepository.delete(member);
             log.info("Identifier={} : 사용자 탈퇴", identifier);
             return  true;
