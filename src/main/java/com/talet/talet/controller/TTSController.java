@@ -1,5 +1,6 @@
 package com.talet.talet.controller;
 
+import com.talet.talet.dto.TTSDefaultDTO;
 import com.talet.talet.dto.TTSRequestDTO;
 import com.talet.talet.dto.TTSResultRequestDTO;
 import com.talet.talet.service.TTSService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +39,8 @@ public class TTSController {
     }
 
     @GetMapping("/default/book")
-    public ResponseEntity<?> requestTTSApi() {
-        return null;
+    public Mono<ResponseEntity<?>> requestTTSApi(@RequestBody TTSDefaultDTO dto) {
+        return ttsService.bookTts(dto).map(ResponseEntity::ok);
     }
 
     @Operation(summary = "동화책 내용 받아오기", description = "polling 으로 동화책 내용 받아오기")

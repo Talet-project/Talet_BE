@@ -34,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/login", "auth/admin/login", "/admin/book/add").permitAll()
                         .requestMatchers("/images/**", "/voices/**", "/tts/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/tts/default/book").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

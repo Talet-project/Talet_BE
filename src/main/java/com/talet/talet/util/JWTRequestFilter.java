@@ -45,7 +45,8 @@ public class JWTRequestFilter extends OncePerRequestFilter {
             "/voices/**",
             "/tts/**",
             "/swagger-ui/**",
-            "/v3/api-docs/**"
+            "/v3/api-docs/**",
+            "/api/tts/default/book"
     );
 
     @Override
