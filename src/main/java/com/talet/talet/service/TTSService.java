@@ -147,6 +147,11 @@ public class TTSService {
             path = Path.of(ttsUploadDir, book, "girl").resolve(fileName);
         }
 
+        if (Files.exists(path)) {
+            log.info("TTS 캐시 사용: {}", path.getFileName());
+            return Mono.just(path);
+        }
+
         return requestWavBytes(voiceId, request, path);
     }
 
@@ -177,19 +182,6 @@ public class TTSService {
                                     StandardOpenOption.TRUNCATE_EXISTING))
                             .thenReturn(path);
                 });
-    }
-
-    private Mono<Void> writeFile(Path path, byte[] bytes) {
-        return Mono.fromRunnable(() -> {
-                    try {
-                        Files.createDirectories(path.getParent());
-                        Files.write(path, bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-                    } catch (Exception e) {
-                        throw new RuntimeException("파일 저장 실패: ", e);
-                    }
-                })
-                .subscribeOn(Schedulers.boundedElastic())
-                .then();
     }
 
 }
