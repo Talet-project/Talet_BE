@@ -101,14 +101,19 @@
             </div>
         </section>
 
+<!--        <section class="card">-->
+<!--            <h2 style="margin:0 0 12px;font-size:18px">태그</h2>-->
+<!--            <div id="tagList" class="list"></div>-->
+<!--            <div class="row" style="margin-top:8px">-->
+<!--                <button type="button" class="btn pri" id="addTag">+ 태그 추가</button>-->
+<!--                <span class="muted">빈 칸은 자동으로 무시됩니다.</span>-->
+<!--            </div>-->
+<!--        </section>-->
         <section class="card">
-            <h2 style="margin:0 0 12px;font-size:18px">태그</h2>
-            <div id="tagList" class="list"></div>
-            <div class="row" style="margin-top:8px">
-                <button type="button" class="btn pri" id="addTag">+ 태그 추가</button>
-                <span class="muted">빈 칸은 자동으로 무시됩니다.</span>
-            </div>
+            <h2 style="margin:0 0 12px;font-size:18px">태그 선택</h2>
+            <div id="tagCheckboxArea" class="grid two"></div>
         </section>
+
 
         <section class="card">
             <h2 style="margin:0 0 12px;font-size:18px">전송 미리보기(JSON)</h2>
@@ -137,6 +142,19 @@
     const API_UPLOAD_THUMB = "/book/add/thumbnail";
     const API_UPLOAD_STILL = "/book/add/still";
     const ADMIN_LOGIN_PAGE = "/admin/login";
+
+    // ====== 태그종류 ======
+    const FIXED_TAGS = [
+        { key: "courage", label: "용기" },
+        { key: "wisdom", label: "지혜" },
+        { key: "goodAndEvil", label: "선과 악" },
+        { key: "sharing", label: "나눔" },
+        { key: "familyLove", label: "가족애" },
+        { key: "friendship", label: "우정" },
+        { key: "justice", label: "정의" },
+        { key: "growth", label: "성장" }
+    ];
+
 
     // ====== 토큰 유틸 ======
     function getAdminToken() {
@@ -251,11 +269,38 @@
         return res;
     }
 
+    const tagCheckboxArea = document.getElementById("tagCheckboxArea");
+
+    function renderTagCheckboxes() {
+        tagCheckboxArea.innerHTML = "";
+
+        FIXED_TAGS.forEach(tag => {
+            const label = document.createElement("label");
+            label.className = "row";
+            label.style.gap = "8px";
+
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.value = tag.key;
+
+            checkbox.addEventListener("change", updatePreview);
+
+            const span = document.createElement("span");
+            span.textContent = tag.label;
+
+            label.appendChild(checkbox);
+            label.appendChild(span);
+
+            tagCheckboxArea.appendChild(label);
+        });
+    }
+
+
     // ====== DOM ======
     const formEl = document.getElementById("bookForm");
     const previewEl = document.getElementById("preview");
-    const tagList = document.getElementById("tagList");
-    const addTagBtn = document.getElementById("addTag");
+    // const tagList = document.getElementById("tagList");
+    // const addTagBtn = document.getElementById("addTag");
     const resetBtn = document.getElementById("resetBtn");
     const rowTpl = document.getElementById("tpl-row");
 
@@ -389,12 +434,17 @@
 
     // ====== 수집/검증/전송 ======
     function collectData() {
+        const checkedTags = Array.from(
+            document.querySelectorAll("#tagCheckboxArea input:checked")
+        ).map(cb => cb.value);
+
         return {
             name: document.getElementById("name").value.trim(),
             englishName: getEnglishName(),
             thumbnail: state.thumbnail,
             stillImages: { ...state.stillImages }, // Map 형태로 전송
-            tags: valuesFrom(tagList)
+            // tags: valuesFrom(tagList)
+            tags: checkedTags
         };
     }
 
@@ -430,8 +480,12 @@
         state.stillImages = {};
         state.stillOrder = 0;
 
-        tagList.innerHTML = "";
-        tagList.appendChild(makeTagRow());
+        // tagList.innerHTML = "";
+        // tagList.appendChild(makeTagRow());
+        document
+            .querySelectorAll("#tagCheckboxArea input")
+            .forEach(cb => cb.checked = false);
+
 
         renderThumb();
         renderStillChips();
@@ -483,7 +537,7 @@
         }
     });
 
-    addTagBtn.addEventListener("click", () => { tagList.appendChild(makeTagRow()); updatePreview(); });
+    // addTagBtn.addEventListener("click", () => { tagList.appendChild(makeTagRow()); updatePreview(); });
     resetBtn.addEventListener("click", (e) => { e.preventDefault(); resetForm(); });
     formEl.addEventListener("input", updatePreview);
 
@@ -508,7 +562,8 @@
         const p = decodeJwtPayload(getAdminToken());             // ★
         console.debug("[admin token payload]", p);               // ★
         startExpiryWatcher();
-        tagList.appendChild(makeTagRow());
+        // tagList.appendChild(makeTagRow());
+        renderTagCheckboxes();
         renderThumb();
         renderStillChips();
         toggleUploadButtons();

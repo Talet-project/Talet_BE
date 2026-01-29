@@ -11,10 +11,7 @@ import com.talet.talet.exception.CustomException;
 import com.talet.talet.repository.BookMarkRepository;
 import com.talet.talet.repository.FairyTaleBookRepository;
 import com.talet.talet.repository.MemberRepository;
-import com.talet.talet.util.BookReader;
-import com.talet.talet.util.ErrorEnum;
-import com.talet.talet.util.JWTTokenUtil;
-import com.talet.talet.util.LanguageEnum;
+import com.talet.talet.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,7 +52,7 @@ public class FairyTaleBookService {
                     .id(book.getId())
                     .name(book.getName())
                     .thumbnail(book.getThumbnail())
-                    .tags(book.getTags())
+                    .tags(BookTag.toApiList(book.getTags()))
                     .plot(plot).build();
             bookResponseDTOList.add(dto);
         });
@@ -74,7 +71,7 @@ public class FairyTaleBookService {
                     .id(book.getId())
                     .name(book.getName())
                     .thumbnail(book.getThumbnail())
-                    .tags(book.getTags())
+                    .tags(BookTag.toApiList(book.getTags()))
                     .shorts(shorts)
                     .bookmark(bookmark).build();
             lookingBooks.add(dto);
@@ -92,7 +89,7 @@ public class FairyTaleBookService {
                     .id(book.getId())
                     .name(book.getName())
                     .thumbnail(book.getThumbnail())
-                    .tags(book.getTags())
+                    .tags(BookTag.toApiList(book.getTags()))
                     .plot(plot).build();
             bookResponseDTOList.add(dto);
         });
@@ -109,7 +106,7 @@ public class FairyTaleBookService {
                     .id(book.getId())
                     .name(book.getName())
                     .thumbnail(book.getThumbnail())
-                    .tags(book.getTags())
+                    .tags(BookTag.toApiList(book.getTags()))
                     .plot(plot).build();
             bookResponseDTOList.add(dto);
         });
@@ -138,7 +135,7 @@ public class FairyTaleBookService {
                 .name(book.getName())
                 .thumbnail(book.getThumbnail())
                 .stillImages(stillImages)
-                .tags(book.getTags())
+                .tags(BookTag.toApiList(book.getTags()))
                 .shorts(shorts)
                 .plots(plots)
                 .bookmark(bookmark).build();
@@ -262,7 +259,7 @@ public class FairyTaleBookService {
         fairyTaleBook.setName(addBookRequestDTO.getName());
         fairyTaleBook.setEnglishName(addBookRequestDTO.getEnglishName());
         fairyTaleBook.setCount(0);
-        fairyTaleBook.setTags(addBookRequestDTO.getTags());
+        fairyTaleBook.setTags(BookTag.fromList(addBookRequestDTO.getTags()));
         fairyTaleBook.setThumbnail(addBookRequestDTO.getThumbnail());
         fairyTaleBook.setUnitCount(0);
         fairyTaleBook.setFilePath(fileDir + "/" + addBookRequestDTO.getEnglishName());

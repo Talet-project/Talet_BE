@@ -1,5 +1,6 @@
 package com.talet.talet.entity;
 
+import com.talet.talet.util.BookTag;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,10 +32,14 @@ public class FairyTaleBook {
     @OrderBy("orderIndex ASC")
     private List<BookStillImage> stillImages = new ArrayList<>(); // 책 스틸컷
 
-    @ElementCollection
-    @CollectionTable(name = "book_tag", joinColumns = @JoinColumn(name = "book_id"))
+    @ElementCollection(targetClass = BookTag.class)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(
+            name = "book_tag",
+            joinColumns = @JoinColumn(name = "book_id")
+    )
     @Column(name = "tag")
-    private List<String> tags; // 책 태그
+    private List<BookTag> tags = new ArrayList<>(); // 책 태그
 
     @Column(nullable = false)
     private int count; // 책 클릭 수
