@@ -2,10 +2,7 @@ package com.talet.talet.controller;
 
 import com.talet.talet.docs.member.Member;
 import com.talet.talet.docs.member.MemberProfileUpdate;
-import com.talet.talet.dto.BookMarkResponseDTO;
-import com.talet.talet.dto.MemberProfileImageRequestDTO;
-import com.talet.talet.dto.MemberRequestDTO;
-import com.talet.talet.dto.MemberResponseDTO;
+import com.talet.talet.dto.*;
 import com.talet.talet.exception.CustomException;
 import com.talet.talet.service.MemberService;
 import com.talet.talet.util.TaletApiResponse;
@@ -81,4 +78,13 @@ public class MemberController {
     }
 
     // 다 읽었어요
+
+    // 지금 읽고있어요 & 찜 목록 - 유저 책장
+    @GetMapping("/bookshelf")
+    public ResponseEntity<?> bookshelf(@AuthenticationPrincipal UserDetails userDetails) {
+        List<BookshelfDTO> data = memberService.bookshelf(userDetails.getUsername());
+        log.info("Identifier={} : 사용자 책장 목록 조회 성공", userDetails.getUsername());
+        return ResponseEntity.ok(TaletApiResponse.success(data));
+    }
+
 }

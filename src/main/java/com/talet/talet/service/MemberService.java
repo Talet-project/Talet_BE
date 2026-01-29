@@ -1,13 +1,17 @@
 package com.talet.talet.service;
 
 import com.talet.talet.dto.BookMarkResponseDTO;
+import com.talet.talet.dto.BookshelfDTO;
 import com.talet.talet.dto.MemberRequestDTO;
 import com.talet.talet.dto.MemberResponseDTO;
+import com.talet.talet.entity.BookMark;
 import com.talet.talet.entity.FairyTaleBook;
 import com.talet.talet.entity.Member;
+import com.talet.talet.entity.ReadingBook;
 import com.talet.talet.exception.CustomException;
 import com.talet.talet.repository.BookMarkRepository;
 import com.talet.talet.repository.MemberRepository;
+import com.talet.talet.repository.ReadingBookRepository;
 import com.talet.talet.util.ErrorEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -29,6 +31,7 @@ import java.util.UUID;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final BookMarkRepository bookMarkRepository;
+    private final ReadingBookRepository readingBookRepository;
     @Value("${storage.users-images-dir}")
     private String usersImagesDir;
     @Value("${storage.public-base-url}")
@@ -150,6 +153,42 @@ public class MemberService {
         });
         log.info("Identifier={} : 사용자 찜 목록 조회", identifier);
         return bookMarkResponseDTOList;
+    }
+
+    public List<BookshelfDTO> bookshelf(String identifier) {
+        Member member = memberRepository.findByIdentifier(identifier);
+        Map<String, BookshelfDTO> bookshelfDTOMap = new HashMap<String, BookshelfDTO>();
+        List<ReadingBook> readingBookList = readingBookRepository.findReadingBookByMemberId(member.getMemberId());
+        List<BookMark> bookMarkList = bookMarkRepository.findBookMarkByMemberId(member.getMemberId());
+        for (BookMark bookMark : bookMarkList) {
+            BookshelfDTO dto = new BookshelfDTO();
+            FairyTaleBook book = bookMark.getBook();
+            dto.setBookId(book.getId());
+            dto.setBookName(book.getName());
+            dto.setThumbnail(book.getThumbnail());
+            dto.setTotalPage(book.getTotalPage());
+            dto.setLiked(true);
+            bookshelfDTOMap.put(book.getId(), dto);
+        }
+        for (ReadingBook readingBook : readingBookList) {
+            FairyTaleBook book = readingBook.getBook();
+            if (bookshelfDTOMap.get(book.getId()) != null) {
+                BookshelfDTO dto = bookshelfDTOMap.get(book.getId());
+                dto.setCurrentPage(readingBook.getCurrentPage());
+                bookshelfDTOMap.put(book.getId(), dto);
+                continue;
+            }
+            BookshelfDTO dto = new BookshelfDTO();
+            dto.setBookId(book.getId());
+            dto.setBookName(book.getName());
+            dto.setThumbnail(book.getThumbnail());
+            dto.setTotalPage(book.getTotalPage());
+            dto.setCurrentPage(readingBook.getCurrentPage());
+            dto.setLiked(bookMarkRepository.existsByMemberAndBook(member, book));
+            bookshelfDTOMap.put(book.getId(), dto);
+        }
+
+        return new ArrayList<>(bookshelfDTOMap.values());
     }
 
 }

@@ -261,7 +261,7 @@ public class FairyTaleBookService {
         fairyTaleBook.setCount(0);
         fairyTaleBook.setTags(BookTag.fromList(addBookRequestDTO.getTags()));
         fairyTaleBook.setThumbnail(addBookRequestDTO.getThumbnail());
-        fairyTaleBook.setUnitCount(0);
+        fairyTaleBook.setTotalPage(0);
         fairyTaleBook.setFilePath(fileDir + "/" + addBookRequestDTO.getEnglishName());
         // ✅ 여기부터가 핵심 (Map -> BookStillImage 여러 개 생성)
         Map<String, String> stillMap = addBookRequestDTO.getStillImages();
