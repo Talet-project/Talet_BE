@@ -9,6 +9,7 @@ import com.talet.talet.util.TaletApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,7 +55,7 @@ public class TTSController {
         map.put("status", "processing");
 
         if (status == null || !"done".equals(status)) {
-            return ResponseEntity.ok(TaletApiResponse.success(map, "아직 처리중입니다."));
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(TaletApiResponse.success(map, "아직 처리중입니다."));
         }
         String path = redisTemplate.opsForValue().get(baseKey + ":path");
         map.put("status", "done");

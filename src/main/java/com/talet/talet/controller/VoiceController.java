@@ -39,7 +39,7 @@ public class VoiceController {
         if (!isUpload) {
             throw new CustomException(ErrorEnum.COMMON_INTERNAL_ERROR);
         }
-        return ResponseEntity.ok(TaletApiResponse.successMessage("음성 파일이 정상적으로 저장되었습니다."));
+        return ResponseEntity.noContent().build();
     }
 
     // 음성파일 리스트 조회
@@ -69,6 +69,6 @@ public class VoiceController {
     @DeleteMapping("/{voiceFileId}")
     public ResponseEntity<?> deleteVoice(@PathVariable Long voiceFileId) {
         voiceFileService.deleteVoiceFile(voiceFileId);
-        return ResponseEntity.ok(TaletApiResponse.successMessage("음성파일이 정상적으로 삭제되었습니다."));
+        return ResponseEntity.noContent().build();
     }
 }

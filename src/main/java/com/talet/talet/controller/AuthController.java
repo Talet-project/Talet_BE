@@ -17,10 +17,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.http.HttpClient;
 
 @Slf4j
 @RestController
@@ -38,7 +41,7 @@ public class AuthController {
         TokenResponse token = authService.handleGoogleLogin(request.getIdToken());
         if (token.getSignUpToken() != null) {
             log.info("구글 회원가입 토큰 발급");
-            return ResponseEntity.status(201).body(TaletApiResponse.success(token));
+            return ResponseEntity.status(HttpStatus.CREATED).body(TaletApiResponse.success(token));
         }
         log.info("구글 로그인 토큰 발급");
         return ResponseEntity.ok(TaletApiResponse.success(token));
@@ -52,7 +55,7 @@ public class AuthController {
         TokenResponse token = authService.handleAppleLogin(request.getIdToken());
         if (token.getSignUpToken() != null) {
             log.info("애플 회원가입 토큰 발급");
-            return ResponseEntity.status(201).body(TaletApiResponse.success(token));
+            return ResponseEntity.status(HttpStatus.CREATED).body(TaletApiResponse.success(token));
         }
         log.info("애플 로그인 토큰 발급");
         return ResponseEntity.ok(TaletApiResponse.success(token));
@@ -100,7 +103,7 @@ public class AuthController {
         if (!result) {
             throw new CustomException(ErrorEnum.AUTH_TOKEN_EXPIRED);
         }
-        return ResponseEntity.ok(TaletApiResponse.successMessage("토큰 유효"));
+        return ResponseEntity.noContent().build();
     }
 
 
@@ -111,7 +114,7 @@ public class AuthController {
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token, @AuthenticationPrincipal UserDetails userDetails) {
         authService.removeToken(token);
         log.info("identifier={} : 로그아웃 완료", userDetails.getUsername());
-        return ResponseEntity.ok(TaletApiResponse.successMessage("로그아웃이 성공적으로 완료되었습니다."));
+        return ResponseEntity.noContent().build();
     }
 
     // 탈퇴
@@ -125,7 +128,7 @@ public class AuthController {
             throw new CustomException(ErrorEnum.COMMON_INTERNAL_ERROR);
         }
         log.info("identifier={} : 탈퇴 완료", userDetails.getUsername());
-        return ResponseEntity.ok(TaletApiResponse.successMessage("성공적으로 탈퇴가 완료되었습니다."));
+        return ResponseEntity.noContent().build();
     }
 
     // 관리자 로그인
