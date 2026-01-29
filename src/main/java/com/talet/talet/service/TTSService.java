@@ -105,7 +105,7 @@ public class TTSService {
     public Mono<List<String>> test (TTSDefaultDTO dto) {
         FairyTaleBook book = fairyTaleBookService.getBook(dto.getBookId());
         String fullText = fairyTaleBookService.getContent(book.getEnglishName());
-        List<String> textLines = Arrays.stream(fullText.split("//////////")).map(String::trim).filter(s -> !s.isBlank()).toList(); // 우선 여기 처리 방식 미뤄두고
+        List<String> textLines = Arrays.stream(fullText.split("<br>")).map(String::trim).filter(s -> !s.isBlank()).toList(); // 우선 여기 처리 방식 미뤄두고
         for(String line : textLines) {
             System.out.println(line);
         }
@@ -118,7 +118,6 @@ public class TTSService {
             voiceId = "7c8586b2869391ac4c7389";
             isMan = false;
         }
-
 
         int concurrency = textLines.size();
         return Flux.fromIterable(textLines)

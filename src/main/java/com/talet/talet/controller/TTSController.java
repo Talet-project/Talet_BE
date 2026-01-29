@@ -38,6 +38,7 @@ public class TTSController {
         }
     }
 
+    @Operation(summary = "기본음성 동화책 api", description = "기본 음성 api로 동화책 읽어주기")
     @GetMapping("/default/book")
     public Mono<ResponseEntity<?>> requestTTSApi(@RequestBody TTSDefaultDTO dto) {
         return ttsService.bookTts(dto).map(ResponseEntity::ok);

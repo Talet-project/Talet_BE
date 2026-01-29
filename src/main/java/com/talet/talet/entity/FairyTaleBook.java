@@ -44,7 +44,7 @@ public class FairyTaleBook {
     private String filePath; // 책 파일 위치
 
     @Column(nullable = false)
-    private int unitCount; // 책 줄 개수(문단 말고 한줄 한줄로 저장)
+    private int unitCount; // 책 줄 개수(문단 말고 한줄 한줄로 저장) <-- 이걸 페이지로 변경
 
     //책이 삭제될 때 찜 목록도 전체 다 삭제되도록 설정
     @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
