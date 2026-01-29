@@ -270,7 +270,7 @@
     const stillChips = document.getElementById("stillChips");
 
     // ====== 상태 ======
-    const state = { thumbnail: "", stillImages: [], tags: [""] };
+    const state = { thumbnail: "", stillImages: {}, stillOrder: 0, tags: [""] };
 
     // ====== 유틸 ======
     function valuesFrom(listEl) {
@@ -319,16 +319,51 @@
 
     function renderStillChips() {
         stillChips.innerHTML = "";
-        state.stillImages.forEach((url, i) => {
-            const row = document.createElement("div"); row.className = "row";
-            const a = document.createElement("a"); a.textContent = url; a.href = url; a.target = "_blank"; a.className = "muted"; a.style.flex = "1";
-            const del = document.createElement("button"); del.className = "btn err"; del.type = "button"; del.textContent = "삭제";
-            del.addEventListener("click", () => { state.stillImages.splice(i, 1); renderStillChips(); });
-            row.appendChild(a); row.appendChild(del);
+
+        const entries = Object.entries(state.stillImages)
+            .sort((a, b) => Number(a[0]) - Number(b[0])); // index 오름차순
+
+        entries.forEach(([idx, url]) => {
+            const row = document.createElement("div");
+            row.className = "row";
+
+            const label = document.createElement("span");
+            label.className = "chip";
+            label.textContent = `#${idx}`;
+            label.style.minWidth = "52px";
+            label.style.justifyContent = "center";
+
+            const a = document.createElement("a");
+            a.textContent = url;
+            a.href = url;
+            a.target = "_blank";
+            a.className = "muted";
+            a.style.flex = "1";
+
+            const del = document.createElement("button");
+            del.className = "btn err";
+            del.type = "button";
+            del.textContent = "삭제";
+            del.addEventListener("click", () => {
+                delete state.stillImages[idx];
+
+                // (선택) 마지막 컷을 지우면 stillOrder도 한 칸 당겨주기
+                // ex) 1,2,3중 3삭제 -> stillOrder=2
+                const keys = Object.keys(state.stillImages).map(Number);
+                state.stillOrder = keys.length ? Math.max(...keys) : 0;
+
+                renderStillChips();
+            });
+
+            row.appendChild(label);
+            row.appendChild(a);
+            row.appendChild(del);
             stillChips.appendChild(row);
         });
+
         updatePreview();
     }
+
 
     // 파일 업로드 (Authorization 자동 첨부)
     async function uploadFile(endpoint, file) {
@@ -358,10 +393,11 @@
             name: document.getElementById("name").value.trim(),
             englishName: getEnglishName(),
             thumbnail: state.thumbnail,
-            stillImages: state.stillImages.slice(),
+            stillImages: { ...state.stillImages }, // Map 형태로 전송
             tags: valuesFrom(tagList)
         };
     }
+
     function validate(data) {
         const errs = [];
         if (!data.name) errs.push("책 제목은 필수입니다.");
@@ -391,9 +427,12 @@
     function resetForm() {
         formEl.reset();
         state.thumbnail = "";
-        state.stillImages = [];
+        state.stillImages = {};
+        state.stillOrder = 0;
+
         tagList.innerHTML = "";
         tagList.appendChild(makeTagRow());
+
         renderThumb();
         renderStillChips();
         toggleUploadButtons();
@@ -421,14 +460,27 @@
     uploadStillsBtn.addEventListener("click", async () => {
         const files = Array.from(stillFilesInput.files || []);
         if (files.length === 0) { alert("스틸컷 파일을 선택하세요."); return; }
+
         try {
             for (const f of files) {
                 const url = await uploadFile(API_UPLOAD_STILL, f);
-                state.stillImages.push(url);
+
+                // 다음 인덱스 계산: 1부터 시작
+                const nextIndex = state.stillOrder + 1;
+
+                // index -> url 저장 (키는 문자열로)
+                state.stillImages[String(nextIndex)] = url;
+
+                // 카운터 갱신
+                state.stillOrder = nextIndex;
+
+                renderStillChips();
             }
-            renderStillChips();
+
             stillFilesInput.value = "";
-        } catch (e) { alert(e.message || e); }
+        } catch (e) {
+            alert(e.message || e);
+        }
     });
 
     addTagBtn.addEventListener("click", () => { tagList.appendChild(makeTagRow()); updatePreview(); });

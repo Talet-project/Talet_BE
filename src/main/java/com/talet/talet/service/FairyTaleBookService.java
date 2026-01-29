@@ -4,6 +4,7 @@ import com.talet.talet.dto.AddBookRequestDTO;
 import com.talet.talet.dto.BookDetailDTO;
 import com.talet.talet.dto.BookResponseDTO;
 import com.talet.talet.dto.LookingBookDTO;
+import com.talet.talet.entity.BookStillImage;
 import com.talet.talet.entity.FairyTaleBook;
 import com.talet.talet.entity.Member;
 import com.talet.talet.exception.CustomException;
@@ -126,12 +127,17 @@ public class FairyTaleBookService {
         Map<String, String> shorts = getShorts(book.getEnglishName(), member.getNativeLanguages());
         Map<String, String> plots = getPlots(book.getEnglishName(), member.getNativeLanguages());
         boolean bookmark = bookMarkRepository.existsByMemberAndBook(member, book);
+        List<String> stillImages = new ArrayList<>();
+        List<BookStillImage> bookStillImages = book.getStillImages();
+        bookStillImages.forEach(bookStillImage -> {
+            stillImages.add(bookStillImage.getImage());
+        });
         log.info("Identifier={} : 사용자, Book={} : 책", identifier, book.getName());
         return BookDetailDTO.builder()
                 .id(book.getId())
                 .name(book.getName())
                 .thumbnail(book.getThumbnail())
-                .stillImages(book.getStillImages())
+                .stillImages(stillImages)
                 .tags(book.getTags())
                 .shorts(shorts)
                 .plots(plots)
@@ -258,9 +264,32 @@ public class FairyTaleBookService {
         fairyTaleBook.setCount(0);
         fairyTaleBook.setTags(addBookRequestDTO.getTags());
         fairyTaleBook.setThumbnail(addBookRequestDTO.getThumbnail());
-        fairyTaleBook.setStillImages(addBookRequestDTO.getStillImages());
         fairyTaleBook.setUnitCount(0);
         fairyTaleBook.setFilePath(fileDir + "/" + addBookRequestDTO.getEnglishName());
+        // ✅ 여기부터가 핵심 (Map -> BookStillImage 여러 개 생성)
+        Map<String, String> stillMap = addBookRequestDTO.getStillImages();
+        if (stillMap != null && !stillMap.isEmpty()) {
+
+            // 1) key(인덱스) 오름차순 정렬
+            List<Map.Entry<String, String>> entries = new ArrayList<>(stillMap.entrySet());
+            entries.sort((a, b) -> Integer.compare(
+                    Integer.parseInt(a.getKey()),
+                    Integer.parseInt(b.getKey())
+            ));
+
+            // 2) 정렬된 순서대로 BookStillImage 만들어서 book에 추가
+            for (Map.Entry<String, String> e : entries) {
+                int orderIndex = Integer.parseInt(e.getKey()); // "1" -> 1
+                String url = e.getValue();
+
+                BookStillImage img = new BookStillImage();
+                img.setBook(fairyTaleBook);            // ✅ 이 이미지가 어떤 책 것인지 연결
+                img.setImage(url);            // ✅ url 저장
+                img.setOrderIndex(orderIndex);// ✅ 1,2,3...
+
+                fairyTaleBook.getStillImages().add(img); // ✅ book이 가진 이미지 목록에 추가
+            }
+        }
         fairyTaleBookRepository.save(fairyTaleBook);
     }
 

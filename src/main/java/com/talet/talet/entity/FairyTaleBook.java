@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,10 +27,9 @@ public class FairyTaleBook {
     @Column(nullable = false)
     private String thumbnail; // 책 썸네일
 
-    @ElementCollection
-    @CollectionTable(name = "book_still_image", joinColumns = @JoinColumn(name = "book_id"))
-    @Column(name = "image")
-    private List<String> stillImages; // 책 스틸컷
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("orderIndex ASC")
+    private List<BookStillImage> stillImages = new ArrayList<>(); // 책 스틸컷
 
     @ElementCollection
     @CollectionTable(name = "book_tag", joinColumns = @JoinColumn(name = "book_id"))
