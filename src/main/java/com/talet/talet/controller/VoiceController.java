@@ -51,19 +51,6 @@ public class VoiceController {
         return ResponseEntity.ok(TaletApiResponse.success(voices));
     }
 
-    // 음성파일 다운로드
-//    @GetMapping("/{voiceFileId}")
-//    public ResponseEntity<?> downloadVoice(@PathVariable Long voiceFileId) {
-//        VoiceFile voiceFile = voiceFileService.getVoiceFile(voiceFileId);
-//        Resource resource = new FileSystemResource(voiceFile.getFilePath());
-//
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-//                .header(HttpHeaders.CONTENT_DISPOSITION,
-//                        "attachment; filename=\"" + resource.getFilename() + "\"")
-//                .body(TaletApiResponse.success(resource));
-//    }
-
     // 음성파일 삭제
     @Operation(summary = "음성파일 삭제", description = "음성파일 삭제 api", security = {@SecurityRequirement(name = "bearerAuth")})
     @DeleteMapping("/{voiceFileId}")

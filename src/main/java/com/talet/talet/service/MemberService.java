@@ -1,15 +1,13 @@
 package com.talet.talet.service;
 
-import com.talet.talet.dto.BookMarkResponseDTO;
-import com.talet.talet.dto.BookshelfDTO;
-import com.talet.talet.dto.MemberRequestDTO;
-import com.talet.talet.dto.MemberResponseDTO;
+import com.talet.talet.dto.*;
 import com.talet.talet.entity.BookMark;
 import com.talet.talet.entity.FairyTaleBook;
 import com.talet.talet.entity.Member;
 import com.talet.talet.entity.ReadingBook;
 import com.talet.talet.exception.CustomException;
 import com.talet.talet.repository.BookMarkRepository;
+import com.talet.talet.repository.FairyTaleBookRepository;
 import com.talet.talet.repository.MemberRepository;
 import com.talet.talet.repository.ReadingBookRepository;
 import com.talet.talet.util.ErrorEnum;
@@ -32,6 +30,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BookMarkRepository bookMarkRepository;
     private final ReadingBookRepository readingBookRepository;
+    private final FairyTaleBookRepository fairyTaleBookRepository;
     @Value("${storage.users-images-dir}")
     private String usersImagesDir;
     @Value("${storage.public-base-url}")
@@ -189,6 +188,20 @@ public class MemberService {
         }
 
         return new ArrayList<>(bookshelfDTOMap.values());
+    }
+
+    public void bookmark(BookmarkRequestDTO bookmarkRequestDTO, String identifier) {
+        Member member = memberRepository.findByIdentifier(identifier);
+        FairyTaleBook book = fairyTaleBookRepository.findById(bookmarkRequestDTO.getBookId());
+        BookMark bookMark = bookMarkRepository.findByMember_MemberIdAndBook_Id(member.getMemberId(), bookmarkRequestDTO.getBookId());
+        if (bookMark == null) {
+            bookMark = new BookMark();
+            bookMark.setMember(member);
+            bookMark.setBook(book);
+            bookMarkRepository.save(bookMark);
+        } else {
+            bookMarkRepository.delete(bookMark);
+        }
     }
 
 }

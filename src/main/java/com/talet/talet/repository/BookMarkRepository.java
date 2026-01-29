@@ -22,4 +22,6 @@ public interface BookMarkRepository extends JpaRepository<BookMark, Object> {
 
     @Query("select bm from BookMark bm where bm.member.memberId = :memberId")
     List<BookMark> findBookMarkByMemberId(@Param("memberId") String memberId);
+
+    BookMark findByMember_MemberIdAndBook_Id(@Param("memberId") String memberId, @Param("bookId") String bookId);
 }
