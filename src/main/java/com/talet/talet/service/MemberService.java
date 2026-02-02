@@ -39,6 +39,14 @@ public class MemberService {
     public MemberResponseDTO getUserInfo(String identifier) {
         Member member = memberRepository.findByIdentifier(identifier);
         log.info("Identifier={} : 사용자 정보 조회", identifier);
+        if (member.getProfileImage() == null) {
+            return MemberResponseDTO.builder()
+                    .nickname(member.getName())
+                    .gender(member.getGender())
+                    .birthday(member.getBirthDate())
+                    .languages(member.getNativeLanguages())
+                    .build();
+        }
         return MemberResponseDTO.builder()
                 .nickname(member.getName())
                 .gender(member.getGender())
