@@ -191,7 +191,7 @@ public class MemberService {
             dto.setThumbnail(book.getThumbnail());
             dto.setTotalPage(book.getTotalPage());
             dto.setCurrentPage(readingBook.getCurrentPage());
-            dto.setLiked(bookMarkRepository.existsByMemberAndBook(member, book));
+            dto.setLiked(false);
             bookshelfDTOMap.put(book.getId(), dto);
         }
 

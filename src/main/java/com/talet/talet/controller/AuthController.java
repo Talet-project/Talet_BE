@@ -89,7 +89,7 @@ public class AuthController {
         return ResponseEntity.ok(TaletApiResponse.success(tokenResponse));
     }
 
-    @Operation(summary = "토큰 재발급", description = "토큰 재발급을 위한 api", security = {@SecurityRequirement(name = "bearerAuth")})
+    @Operation(summary = "토큰 재발급", description = "토큰 재발급을 위한 api\nAccess 토큰 만료시 Refresh 토큰까지 전부 재발급", security = {@SecurityRequirement(name = "bearerAuth")})
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String token) {
         TokenResponse newToken = authService.refreshToken(token);

@@ -10,6 +10,10 @@ public class BookshelfDTO {
     private String bookName;
     private String thumbnail;
     private int totalPage;
-    private Integer currentPage;
+    private Integer currentPage; // null 하지말고 0으로
     private boolean isLiked;
+
+    public int getCurrentPage() {
+        return currentPage == null ? 0 : currentPage;
+    }
 }

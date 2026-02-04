@@ -64,19 +64,6 @@ public class MemberController {
         return ResponseEntity.ok(TaletApiResponse.success(member));
     }
 
-    // 내 보이스 보여주기
-
-    // 지금 읽고있어요
-
-    // 찜 목록
-//    @Operation(summary = "찜 목록", description = "유저 찜 목록 api", security = {@SecurityRequirement(name = "bearerAuth")})
-//    @GetMapping("/bookmark")
-//    public ResponseEntity<?> getBookmark(@AuthenticationPrincipal UserDetails userDetails) {
-//        List<BookMarkResponseDTO> data = memberService.getBookMark(userDetails.getUsername());
-//        log.info("Identifier={} : 사용자 찜 목록 조회 성공", userDetails.getUsername());
-//        return ResponseEntity.ok(TaletApiResponse.success(data));
-//    }
-
     @Operation(summary = "북마크", description = "북마크가 안된 상태라면 추가, 추가된 상태라면 삭제", security = {@SecurityRequirement(name = "bearerAuth")})
     @GetMapping("/bookmark")
     public ResponseEntity<?> checkBookmark(@AuthenticationPrincipal UserDetails userDetails, BookmarkRequestDTO bookmarkRequestDTO) {
@@ -85,9 +72,8 @@ public class MemberController {
         return ResponseEntity.noContent().build();
     }
 
-    // 다 읽었어요
-
     // 지금 읽고있어요 & 찜 목록 - 유저 책장
+    @Operation(summary = "내 책장", description = "지금 읽고있어요, 찜 목록 데이터", security = {@SecurityRequirement(name = "bearerAuth")})
     @GetMapping("/bookshelf")
     public ResponseEntity<?> bookshelf(@AuthenticationPrincipal UserDetails userDetails) {
         List<BookshelfDTO> data = memberService.bookshelf(userDetails.getUsername());
