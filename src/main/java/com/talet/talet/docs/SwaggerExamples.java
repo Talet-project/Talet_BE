@@ -157,15 +157,30 @@ public class SwaggerExamples {
         {
             "success": true,
             "message": "요청이 성공적으로 처리되었습니다.",
-            "data": {
+            "data": [{
                 "bookId": "UUID-0001-0001-0001",
                 "bookName": "토끼와 거북이",
-                "thumbnail": "https://talet.site/image/book_thumbnail.jpg",
+                "thumbnail": "https://talet.site/image/book_thumbnail1.jpg",
                 "totalPage": 7,
                 "currentPage": 1,
                 "isLiked": false
-            },
+            },{
+                "bookId": "UUID-0002-0002-0002",
+                "bookName": "흥부와 놀부",
+                "thumbnail": "https://talet.site/image/book_thumbnail2.jpg",
+                "totalPage": 6,
+                "currentPage": 0,
+                "isLiked": true
+            },{
+                "bookId": "UUID-0003-0003-0003",
+                "bookName": "선이의 돌무더기",
+                "thumbnail": "https://talet.site/image/book_thumbnail3.jpg",
+                "totalPage": 6,
+                "currentPage": 0,
+                "isLiked": true
+            }],
             "error": null
+        }
     """;
 
     //============================================================
