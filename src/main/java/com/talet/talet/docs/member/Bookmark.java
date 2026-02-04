@@ -1,7 +1,6 @@
-package com.talet.talet.docs.auth;
+package com.talet.talet.docs.member;
 
 import com.talet.talet.docs.ApiResponseError;
-import com.talet.talet.docs.ApiResponseMessage;
 import com.talet.talet.docs.SwaggerErrorExamples;
 import com.talet.talet.docs.SwaggerExamples;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,7 +19,7 @@ import java.lang.annotation.Target;
 @ApiResponses({
         @ApiResponse(
                 responseCode = "204",
-                description = "회원 탈퇴 성공"
+                description = "북마크 성공 OR 취소"
         ),
         @ApiResponse(
                 responseCode = "400",
@@ -41,6 +40,5 @@ import java.lang.annotation.Target;
                 )
         )
 })
-
-public @interface AuthDelete {
+public @interface Bookmark {
 }

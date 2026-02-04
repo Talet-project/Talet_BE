@@ -28,7 +28,7 @@ public class SwaggerExamples {
         }
     """;
 
-    public static final String TOKEN_RESPONSE_OK = """
+    public static final String TOKEN_REFRESH_OK = """
         {
             "success": true,
             "message": "요청이 성공적으로 처리되었습니다.",
@@ -151,6 +151,21 @@ public class SwaggerExamples {
             },
             "error": null
         }
+    """;
+
+    public static final String BOOK_SHELF_FIND_OK = """
+        {
+            "success": true,
+            "message": "요청이 성공적으로 처리되었습니다.",
+            "data": {
+                "bookId": "UUID-0001-0001-0001",
+                "bookName": "토끼와 거북이",
+                "thumbnail": "https://talet.site/image/book_thumbnail.jpg",
+                "totalPage": 7,
+                "currentPage": 1,
+                "isLiked": false
+            },
+            "error": null
     """;
 
     //============================================================

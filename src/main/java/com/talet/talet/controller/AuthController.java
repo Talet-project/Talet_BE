@@ -1,9 +1,6 @@
 package com.talet.talet.controller;
 
-import com.talet.talet.docs.auth.AuthDelete;
-import com.talet.talet.docs.auth.AuthLogin;
-import com.talet.talet.docs.auth.AuthLogout;
-import com.talet.talet.docs.auth.AuthSignUp;
+import com.talet.talet.docs.auth.*;
 import com.talet.talet.dto.AdminRequestDTO;
 import com.talet.talet.dto.SignUpDTO;
 import com.talet.talet.dto.TokenRequest;
@@ -90,6 +87,7 @@ public class AuthController {
     }
 
     @Operation(summary = "토큰 재발급", description = "토큰 재발급을 위한 api\nAccess 토큰 만료시 Refresh 토큰까지 전부 재발급", security = {@SecurityRequirement(name = "bearerAuth")})
+    @AuthRefresh
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String token) {
         TokenResponse newToken = authService.refreshToken(token);
@@ -97,6 +95,7 @@ public class AuthController {
     }
 
     @Operation(summary = "토큰 인증", description = "토큰이 유효한지 확인하는 api", security = {@SecurityRequirement(name = "bearerAuth")})
+    @AuthValidate
     @GetMapping("/validate")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {
         boolean result = authService.validateToken(token);

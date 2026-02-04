@@ -1,5 +1,7 @@
 package com.talet.talet.controller;
 
+import com.talet.talet.docs.member.Bookmark;
+import com.talet.talet.docs.member.Bookshelf;
 import com.talet.talet.docs.member.Member;
 import com.talet.talet.docs.member.MemberProfileUpdate;
 import com.talet.talet.dto.*;
@@ -65,6 +67,7 @@ public class MemberController {
     }
 
     @Operation(summary = "북마크", description = "북마크가 안된 상태라면 추가, 추가된 상태라면 삭제", security = {@SecurityRequirement(name = "bearerAuth")})
+    @Bookmark
     @GetMapping("/bookmark")
     public ResponseEntity<?> checkBookmark(@AuthenticationPrincipal UserDetails userDetails, BookmarkRequestDTO bookmarkRequestDTO) {
         // 북마크가 되어있는 상태라면 삭제, 아니면 추가
@@ -74,6 +77,7 @@ public class MemberController {
 
     // 지금 읽고있어요 & 찜 목록 - 유저 책장
     @Operation(summary = "내 책장", description = "지금 읽고있어요, 찜 목록 데이터", security = {@SecurityRequirement(name = "bearerAuth")})
+    @Bookshelf
     @GetMapping("/bookshelf")
     public ResponseEntity<?> bookshelf(@AuthenticationPrincipal UserDetails userDetails) {
         List<BookshelfDTO> data = memberService.bookshelf(userDetails.getUsername());

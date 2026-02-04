@@ -1,7 +1,6 @@
-package com.talet.talet.docs.auth;
+package com.talet.talet.docs.member;
 
 import com.talet.talet.docs.ApiResponseError;
-import com.talet.talet.docs.ApiResponseMessage;
 import com.talet.talet.docs.SwaggerErrorExamples;
 import com.talet.talet.docs.SwaggerExamples;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,8 +18,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponses({
         @ApiResponse(
-                responseCode = "204",
-                description = "회원 탈퇴 성공"
+                responseCode = "200",
+                description = "내 책장 데이터 검색",
+                content = @Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = ApiResponseBookshelfResponse.class),
+                        examples = @ExampleObject(name = "검색 성공", value = SwaggerExamples.BOOK_SHELF_FIND_OK)
+                )
         ),
         @ApiResponse(
                 responseCode = "400",
@@ -42,5 +46,6 @@ import java.lang.annotation.Target;
         )
 })
 
-public @interface AuthDelete {
+
+public @interface Bookshelf {
 }

@@ -1,9 +1,7 @@
 package com.talet.talet.docs.auth;
 
 import com.talet.talet.docs.ApiResponseError;
-import com.talet.talet.docs.ApiResponseMessage;
 import com.talet.talet.docs.SwaggerErrorExamples;
-import com.talet.talet.docs.SwaggerExamples;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,27 +18,21 @@ import java.lang.annotation.Target;
 @ApiResponses({
         @ApiResponse(
                 responseCode = "204",
-                description = "회원 탈퇴 성공"
+                description = "토큰 유효"
         ),
         @ApiResponse(
-                responseCode = "400",
-                description = "잘못된 요청",
+                responseCode = "401",
+                description = "유효하지 않은 토큰 혹은 토큰 만료",
                 content = @Content(
                         mediaType = "application/json",
                         schema = @Schema(implementation = ApiResponseError.class),
-                        examples = @ExampleObject(name = "잘못된 요청", value = SwaggerErrorExamples.COMMON_INVALID_REQUEST)
-                )
-        ),
-        @ApiResponse(
-                responseCode = "500",
-                description = "서버 오류",
-                content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(implementation = ApiResponseError.class),
-                        examples = @ExampleObject(name = "서버 오류", value = SwaggerErrorExamples.COMMON_INTERNAL_ERROR)
+                        examples = {
+                                @ExampleObject(name = "유효하지 않은 토큰", value = SwaggerErrorExamples.AUTH_TOKEN_INVALID),
+                                @ExampleObject(name = "토큰 만료", value = SwaggerErrorExamples.AUTH_TOKEN_EXPIRED)
+                        }
                 )
         )
 })
 
-public @interface AuthDelete {
+public @interface AuthValidate {
 }

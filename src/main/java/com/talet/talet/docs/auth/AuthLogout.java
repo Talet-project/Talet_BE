@@ -19,13 +19,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponses({
         @ApiResponse(
-                responseCode = "200",
-                description = "로그아웃 성공",
-                content = @Content(
-                        mediaType = "application/json",
-                        schema = @Schema(implementation = ApiResponseMessage.class),
-                        examples = @ExampleObject(name = "로그아웃 성공", value = SwaggerExamples.LOGOUT_OK)
-                )
+                responseCode = "204",
+                description = "로그아웃 성공"
         ),
         @ApiResponse(
                 responseCode = "400",
