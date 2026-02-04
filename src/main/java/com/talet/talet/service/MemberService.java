@@ -212,4 +212,14 @@ public class MemberService {
         }
     }
 
+    public void readBook(ReadBookDTO readBookDTO, String identifier) {
+        Member member = memberRepository.findByIdentifier(identifier);
+        FairyTaleBook book = fairyTaleBookRepository.findById(readBookDTO.getBookId());
+        ReadingBook readingBook = new ReadingBook();
+        readingBook.setMember(member);
+        readingBook.setBook(book);
+        readingBook.setCurrentPage(readBookDTO.getCurrentPage());
+        readingBookRepository.save(readingBook);
+    }
+
 }

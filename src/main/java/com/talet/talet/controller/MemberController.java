@@ -1,9 +1,6 @@
 package com.talet.talet.controller;
 
-import com.talet.talet.docs.member.Bookmark;
-import com.talet.talet.docs.member.Bookshelf;
-import com.talet.talet.docs.member.Member;
-import com.talet.talet.docs.member.MemberProfileUpdate;
+import com.talet.talet.docs.member.*;
 import com.talet.talet.dto.*;
 import com.talet.talet.exception.CustomException;
 import com.talet.talet.service.MemberService;
@@ -69,7 +66,7 @@ public class MemberController {
     @Operation(summary = "북마크", description = "북마크가 안된 상태라면 추가, 추가된 상태라면 삭제", security = {@SecurityRequirement(name = "bearerAuth")})
     @Bookmark
     @GetMapping("/bookmark")
-    public ResponseEntity<?> checkBookmark(@AuthenticationPrincipal UserDetails userDetails, BookmarkRequestDTO bookmarkRequestDTO) {
+    public ResponseEntity<?> checkBookmark(@AuthenticationPrincipal UserDetails userDetails, @RequestBody BookmarkRequestDTO bookmarkRequestDTO) {
         // 북마크가 되어있는 상태라면 삭제, 아니면 추가
         memberService.bookmark(bookmarkRequestDTO, userDetails.getUsername());
         return ResponseEntity.noContent().build();
@@ -83,6 +80,15 @@ public class MemberController {
         List<BookshelfDTO> data = memberService.bookshelf(userDetails.getUsername());
         log.info("Identifier={} : 사용자 책장 목록 조회 성공", userDetails.getUsername());
         return ResponseEntity.ok(TaletApiResponse.success(data));
+    }
+
+    @Operation(summary = "책 읽기", description = "책 id를 받아서 currentPage를 업데이트 하는 api", security = @SecurityRequirement(name = "bearerAuth"))
+    @ReadBook
+    @PostMapping("/read")
+    public ResponseEntity<?> read(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ReadBookDTO dto) {
+        memberService.readBook(dto, userDetails.getUsername());
+        log.info("Identifier={}: 현재 읽고 있는 페이지 추가", userDetails.getUsername());
+        return ResponseEntity.noContent().build();
     }
 
 }
