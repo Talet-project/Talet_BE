@@ -87,6 +87,9 @@ public class FairyTaleBookController {
         return ResponseEntity.ok(TaletApiResponse.success(data));
     }
 
+//    @GetMapping("/search")
+
+
     @Hidden
     @PostMapping("/add")
     public TaletApiResponse bookAdd(@RequestBody AddBookRequestDTO addBookRequestDTO) {

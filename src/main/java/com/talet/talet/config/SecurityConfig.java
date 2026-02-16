@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/google", "/auth/apple").permitAll()
                         .requestMatchers("/book/all", "/book/find/tag/**", "/book/ranking").permitAll()
-                        .requestMatchers("/book/add/thumbnail", "book/add/still").hasRole("ADMIN")
+                        .requestMatchers("/book/add/", "/book/add/thumbnail", "/book/add/still").hasRole("ADMIN")
                         .requestMatchers("/admin/login", "auth/admin/login", "/admin/book/add").permitAll()
                         .requestMatchers("/images/**", "/voices/**", "/tts/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
